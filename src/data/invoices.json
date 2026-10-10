@@ -1,0 +1,26 @@
+[
+  {
+    "inv": { "id": "inv-demo-1001", "invoice_number": "BSS-1001", "customer_id": null, "customer_name": "Aarav Mehta", "customer_mobile": "9876543210", "price_type": "retail", "payment_method": "UPI", "subtotal": 1700, "discount_type": "fixed", "discount_value": 100, "discount_amount": 100, "gst_amount": 80, "grand_total": 1680, "status": "completed", "cancel_reason": null, "created_by": "user-admin", "created_at": "2026-10-09T09:25:00.000Z" },
+    "items": [
+      { "id": "item-demo-1001-1", "product_id": "prod-royal-navy", "product_name": "Royal Navy Super 120s", "category_name": "Suiting", "unit": "Meter", "quantity": 2, "rate": 850, "original_rate": 850, "amount": 1700, "gst_percent": 5, "price_overridden": false, "piece_quantity": 0 }
+    ]
+  },
+  {
+    "inv": { "id": "inv-demo-1002", "invoice_number": "BSS-1002", "customer_id": null, "customer_name": "Neha Shah", "customer_mobile": "9820123456", "price_type": "retail", "payment_method": "Cash", "subtotal": 1475, "discount_type": "percent", "discount_value": 5, "discount_amount": 73.75, "gst_amount": 70.06, "grand_total": 1471.31, "status": "completed", "cancel_reason": null, "created_by": "user-billing", "created_at": "2026-10-08T12:40:00.000Z" },
+    "items": [
+      { "id": "item-demo-1002-1", "product_id": "prod-white-twill", "product_name": "White Premium Twill", "category_name": "Shirting", "unit": "Meter", "quantity": 5, "rate": 295, "original_rate": 295, "amount": 1475, "gst_percent": 5, "price_overridden": false, "piece_quantity": 0 }
+    ]
+  },
+  {
+    "inv": { "id": "inv-demo-1003", "invoice_number": "BSS-1003", "customer_id": null, "customer_name": "Rohan Desai", "customer_mobile": "", "price_type": "wholesale", "payment_method": "UPI", "subtotal": 1040, "discount_type": "fixed", "discount_value": 0, "discount_amount": 0, "gst_amount": 52, "grand_total": 1092, "status": "completed", "cancel_reason": null, "created_by": "user-admin", "created_at": "2026-10-03T15:15:00.000Z" },
+    "items": [
+      { "id": "item-demo-1003-1", "product_id": "prod-charcoal-check", "product_name": "Charcoal Windowpane", "category_name": "Suiting", "unit": "Meter", "quantity": 2, "rate": 520, "original_rate": 520, "amount": 1040, "gst_percent": 5, "price_overridden": false, "piece_quantity": 0 }
+    ]
+  },
+  {
+    "inv": { "id": "inv-demo-1004", "invoice_number": "BSS-1004", "customer_id": null, "customer_name": "Walk-in", "customer_mobile": "", "price_type": "retail", "payment_method": "Cash", "subtotal": 540, "discount_type": "fixed", "discount_value": 0, "discount_amount": 0, "gst_amount": 27, "grand_total": 567, "status": "cancelled", "cancel_reason": "Duplicate bill", "created_by": "user-billing", "created_at": "2026-09-28T11:05:00.000Z" },
+    "items": [
+      { "id": "item-demo-1004-1", "product_id": "prod-ivory-linen", "product_name": "Ivory Linen Blend", "category_name": "Linen & Blends", "unit": "Meter", "quantity": 1, "rate": 540, "original_rate": 540, "amount": 540, "gst_percent": 5, "price_overridden": false, "piece_quantity": 0 }
+    ]
+  }
+]

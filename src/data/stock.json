@@ -1,0 +1,4 @@
+[
+  { "id": "stock-demo-1", "product_id": "prod-sky-poplin", "quantity": 2.25, "direction": "decrease", "stock_before": 15, "stock_after": 12.75, "reason": "Sample cutting", "created_at": "2026-10-06T10:30:00.000Z" },
+  { "id": "stock-demo-2", "product_id": "prod-buttons", "quantity": 40, "direction": "increase", "stock_before": 200, "stock_after": 240, "reason": "Additional stock", "created_at": "2026-10-05T08:15:00.000Z" }
+]
