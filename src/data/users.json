@@ -1,4 +1,0 @@
-[
-  { "id": "user-admin", "email": "admin@bombaysuiting.demo", "password": "admin123", "full_name": "Bombay Admin", "role": "admin", "is_active": true },
-  { "id": "user-billing", "email": "billing@bombaysuiting.demo", "password": "billing123", "full_name": "Counter Staff", "role": "billing", "is_active": true }
-]
