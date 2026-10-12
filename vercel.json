@@ -5,7 +5,7 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/api/:path*", "destination": "https://bombay-backend-sable.vercel.app/api/:path*" },
+    { "source": "/api/:path*", "destination": "https://bombay-backend-orcin.vercel.app/api/:path*" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
   "headers": [

@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 
-const BACKEND = "https://bombay-backend-sable.vercel.app";
+const BACKEND = "https://bombay-backend-orcin.vercel.app";
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
