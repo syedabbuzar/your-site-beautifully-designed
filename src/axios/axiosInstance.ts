@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
 
-export const BASE_URL = "https://bombay-backend-gamma.vercel.app/api";
+export const BASE_URL = "https://bombay-backend-sable.vercel.app/api";
 export const TOKEN_KEY = "bombay-auth-token";
 export const USER_KEY = "bombay-auth-user";
 
