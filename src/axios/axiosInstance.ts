@@ -1,6 +1,10 @@
 import axios, { AxiosError } from "axios";
 
-export const BASE_URL = "https://bombay-backend-sable.vercel.app/api";
+/** Real backend: https://bombay-backend-sable.vercel.app — reached through the
+ *  same-origin "/api" proxy (vercel.json rewrite in production, Vite proxy in dev)
+ *  so the browser never hits a CORS block. */
+export const BACKEND_URL = "https://bombay-backend-sable.vercel.app";
+export const BASE_URL = "/api";
 export const TOKEN_KEY = "bombay-auth-token";
 export const USER_KEY = "bombay-auth-user";
 
