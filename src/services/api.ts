@@ -79,7 +79,8 @@ export const api = {
   categories: async (): Promise<Category[]> => call(axiosInstance.get("/categories")),
   saveCategory: async (category: { name: string }) => call(axiosInstance.post("/categories", { name: category.name })),
 
-  products: async (search = ""): Promise<Product[]> => {
+  products: async (): Promise<Product[]> => api.searchProducts(""),
+  searchProducts: async (search: string): Promise<Product[]> => {
     const list = await call<any[]>(axiosInstance.get("/products", { params: search ? { search } : undefined }));
     return list.map((p) => {
       const cat = p.category_id && typeof p.category_id === "object" ? p.category_id : null;
