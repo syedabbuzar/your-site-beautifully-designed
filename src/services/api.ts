@@ -72,8 +72,15 @@ export const userService = {
 
 export const api = {
   settings: async (): Promise<Settings> => call(axiosInstance.get("/settings")),
-  updateSettings: async (_changes: Partial<Settings>): Promise<void> => {
-    throw new Error("Saving settings is not available on the server yet.");
+  /** Backend currently has no settings update route (PUT/PATCH/POST /api/settings → 404).
+   *  Uses PUT /settings so it works as soon as the backend adds it. */
+  updateSettings: async (changes: Partial<Settings>): Promise<void> => {
+    try {
+      await call(axiosInstance.put("/settings", changes));
+    } catch (e: any) {
+      if (/route not found/i.test(e?.message ?? "")) throw new Error("Settings can't be saved yet: the backend has no save-settings route (PUT /api/settings).");
+      throw e;
+    }
   },
 
   categories: async (): Promise<Category[]> => call(axiosInstance.get("/categories")),

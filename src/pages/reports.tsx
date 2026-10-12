@@ -37,7 +37,13 @@ function Reports() {
   };
   const byPay = group(done, (i) => i.payment_method, (i) => [1, Number(i.grand_total)]);
   const byProduct = group(its, (i) => i.product_name, (i) => [Number(i.quantity), Number(i.amount)]).sort((a, b) => (b[1][1] ?? 0) - (a[1][1] ?? 0));
-  const byUser = group(done, (i) => users.find((u) => u.id === i.created_by)?.full_name || "Unknown", (i) => [1, Number(i.grand_total)]);
+  const creatorName = (i: (typeof done)[number]) => {
+    const ref: any = i.created_by;
+    const id = ref && typeof ref === "object" ? String(ref.id ?? ref._id ?? "") : String(ref ?? "");
+    const u = users.find((x) => x.id === id);
+    return u?.full_name?.trim() || u?.email || ref?.full_name || ref?.email || "Unknown";
+  };
+  const byUser = group(done, creatorName, (i) => [1, Number(i.grand_total)]);
   const overrides = its.filter((i) => i.price_overridden);
 
   const exportCsv = () => {
