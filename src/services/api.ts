@@ -85,8 +85,11 @@ export const api = {
     return list.map((p) => {
       const cat = p.category_id && typeof p.category_id === "object" ? p.category_id : null;
       return {
+        pattern: "", hsn_code: "", description: "",
         ...p,
-        category_id: cat ? cat.id : p.category_id,
+        // The list endpoint may omit is_active; treat missing as active.
+        is_active: p.is_active !== false,
+        category_id: cat ? cat.id : p.category_id ?? "",
         categories: p.categories ?? (cat ? { name: cat.name } : p.category_name ? { name: p.category_name } : null),
       };
     });

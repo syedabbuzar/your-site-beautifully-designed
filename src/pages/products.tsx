@@ -1,4 +1,5 @@
 import { createFileRoute } from "@/router-shim";
+import { confirmToast } from "@/lib/confirm-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -29,7 +30,9 @@ function Products() {
   const [edit, setEdit] = useState<any>(null);
   const [q, setQ] = useState("");
   const [newCat, setNewCat] = useState("");
-  const list = products.filter((p) => [p.name, p.sku, p.color, p.brand].some((x) => x?.toLowerCase().includes(q.toLowerCase())));
+  const term = q.trim().toLowerCase();
+  const list = products.filter((p) => !term || [p.name, p.sku, p.color, p.brand, p.pattern, p.categories?.name]
+    .some((x) => x != null && String(x).toLowerCase().includes(term)));
 
   const save = async () => {
     if (!edit.name || !edit.sku || !edit.category_id) { toast.error(cats.length ? "Name, code and category are required" : "Add a category first, then select it"); return; }
@@ -40,8 +43,12 @@ function Products() {
     } catch (e: any) { toast.error(e.message); }
   };
   const del = async (p: Product) => {
-    if (!confirm(`Delete ${p.name}? Products with sales history should be deactivated instead.`)) return;
-    try { await api.deleteProduct(p.id); qc.invalidateQueries({ queryKey: ["products"] }); } catch { toast.error("Cannot delete — product has sales. Deactivate it instead."); }
+    if (!await confirmToast(`Delete ${p.name}? Products with sales history should be deactivated instead.`)) return;
+    try {
+      await api.deleteProduct(p.id);
+      toast.success(`${p.name} deleted`);
+      qc.invalidateQueries({ queryKey: ["products"] });
+    } catch (e: any) { toast.error(e.message || "Cannot delete — product has sales. Deactivate it instead."); }
   };
   const addCat = async () => {
     if (!newCat.trim()) return;

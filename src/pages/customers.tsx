@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@/router-shim";
+import { confirmToast } from "@/lib/confirm-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -70,7 +71,7 @@ function Customers() {
     }
   };
   const remove = async (customer: CustomerRecord) => {
-    if (!confirm(`Delete customer ${customer.name}? Invoice history will not be changed.`)) return;
+    if (!await confirmToast(`Delete customer ${customer.name}? Invoice history will not be changed.`)) return;
     try {
       await customerService.remove(customer.id);
       toast.success("Customer deleted");
