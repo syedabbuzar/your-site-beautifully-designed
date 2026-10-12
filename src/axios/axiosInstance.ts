@@ -21,12 +21,14 @@ axiosInstance.interceptors.request.use((config) => {
 
 axiosInstance.interceptors.response.use(
   (res) => res,
-  (error: AxiosError<{ message?: string }>) => {
+  (error: AxiosError<{ message?: string; errors?: { field?: string; message?: string }[] }>) => {
     if (error.response?.status === 401 && !error.config?.url?.includes("/auth/")) {
       tokenStore.clear();
       if (!location.pathname.startsWith("/login")) location.href = "/login";
     }
+    const fieldErr = error.response?.data?.errors?.[0];
     const message =
+      (fieldErr?.message ? `${fieldErr.field ? fieldErr.field + ": " : ""}${fieldErr.message}` : "") ||
       error.response?.data?.message ||
       (error.code === "ECONNABORTED" ? "Server took too long to respond" : error.message) ||
       "Something went wrong";

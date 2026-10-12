@@ -32,7 +32,7 @@ function Products() {
   const list = products.filter((p) => [p.name, p.sku, p.color, p.brand].some((x) => x?.toLowerCase().includes(q.toLowerCase())));
 
   const save = async () => {
-    if (!edit.name || !edit.sku || !edit.category_id) { toast.error("Name, code and category are required"); return; }
+    if (!edit.name || !edit.sku || !edit.category_id) { toast.error(cats.length ? "Name, code and category are required" : "Add a category first, then select it"); return; }
     if (Number(edit.purchase_rate) < 0 || Number(edit.retail_rate) < 0 || Number(edit.wholesale_rate) < 0) { toast.error("Rates cannot be negative"); return; }
     try {
       await api.saveProduct({ ...edit, opening_stock: Number(edit.opening_stock), purchase_rate: Number(edit.purchase_rate), wholesale_rate: Number(edit.wholesale_rate), retail_rate: Number(edit.retail_rate), gst_percent: Number(edit.gst_percent), min_stock: Number(edit.min_stock) });
@@ -105,7 +105,12 @@ function Products() {
               <Field label="Colour"><Input {...f("color")} /></Field>
               <Field label="Design / Pattern"><Input {...f("pattern")} /></Field>
               <Field label="HSN code"><Input {...f("hsn_code")} /></Field>
-              <Field label="Unit"><Input {...f("unit")} /></Field>
+              <Field label="Unit">
+                <Select value={edit.unit === "Piece" ? "Piece" : "Meter"} onValueChange={(v) => setEdit({ ...edit, unit: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent><SelectItem value="Meter">Meter</SelectItem><SelectItem value="Piece">Piece</SelectItem></SelectContent>
+                </Select>
+              </Field>
               {!edit.id && <Field label="Opening stock (M)"><Input type="number" step="0.01" {...f("opening_stock")} /></Field>}
               <Field label={`Purchasing rate ₹/${edit.unit === "Piece" ? "piece" : "M"}`}><Input type="number" min="0" step="0.01" {...f("purchase_rate")} /></Field>
               <Field label={`Wholesale rate ₹/${edit.unit === "Piece" ? "piece" : "M"}`}><Input type="number" step="0.01" {...f("wholesale_rate")} /></Field>
