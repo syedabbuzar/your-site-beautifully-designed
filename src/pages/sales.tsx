@@ -56,11 +56,11 @@ function Sales() {
       toast.error(e.message);
     }
   };
-  const cancel = (i: Invoice) => {
-    const reason = prompt(`Reason for cancelling ${i.invoice_number}?`);
-    if (reason) run(() => api.cancelInvoice(i.id, reason), "Invoice cancelled and stock restored");
+  const cancel = async (i: Invoice) => {
+    if (await confirmToast(`Cancel ${i.invoice_number}? Stock will be returned.`, "Cancel bill"))
+      run(() => api.cancelInvoice(i.id, "Cancelled by staff"), "Invoice cancelled and stock restored");
   };
-  const remove = (i: Invoice) => {
+  const remove = async (i: Invoice) => {
     if (await confirmToast(`Delete ${i.invoice_number} permanently? Stock will be returned.`))
       run(() => api.deleteInvoice(i.id), "Invoice deleted");
   };
