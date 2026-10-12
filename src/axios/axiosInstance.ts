@@ -1,12 +1,11 @@
 import axios, { AxiosError } from "axios";
+import { tokenStore } from "./tokenStore";
 
 /** Real backend: https://bombay-backend-orcin.vercel.app — reached through the
  *  same-origin "/api" proxy (vercel.json rewrite in production, Vite proxy in dev)
  *  so the browser never hits a CORS block. */
 export const BACKEND_URL = "https://bombay-backend-orcin.vercel.app";
 export const BASE_URL = "/api";
-export const TOKEN_KEY = "bombay-auth-token";
-export const USER_KEY = "bombay-auth-user";
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -15,7 +14,7 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use((config) => {
-  const token = localStorage.getItem(TOKEN_KEY);
+  const token = tokenStore.getToken();
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
@@ -24,8 +23,7 @@ axiosInstance.interceptors.response.use(
   (res) => res,
   (error: AxiosError<{ message?: string }>) => {
     if (error.response?.status === 401 && !error.config?.url?.includes("/auth/")) {
-      localStorage.removeItem(TOKEN_KEY);
-      localStorage.removeItem(USER_KEY);
+      tokenStore.clear();
       if (!location.pathname.startsWith("/login")) location.href = "/login";
     }
     const message =

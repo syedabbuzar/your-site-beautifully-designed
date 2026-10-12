@@ -1,4 +1,5 @@
-import axiosInstance, { call, TOKEN_KEY, USER_KEY } from "@/axios/axiosInstance";
+import axiosInstance, { call } from "@/axios/axiosInstance";
+import { tokenStore } from "@/axios/tokenStore";
 
 export type Role = "admin" | "billing";
 export interface Category { id: string; name: string }
@@ -60,8 +61,7 @@ export const userService = {
     const data = await call<{ token: string; user: { id: string; email: string; full_name: string; role: Role } }>(
       axiosInstance.post("/auth/admin-login", { email: email.trim().toLowerCase(), password }),
     );
-    localStorage.setItem(TOKEN_KEY, data.token);
-    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+    tokenStore.set(data.token, data.user);
     return { session: { user: { id: data.user.id, email: data.user.email } }, role: data.user.role, name: data.user.full_name };
   },
   create: async (data: { email: string; password: string; full_name: string; role: Role }) =>
@@ -141,22 +141,20 @@ export const api = {
 
 export const authService = {
   restore: async () => {
-    const token = localStorage.getItem(TOKEN_KEY);
-    const raw = localStorage.getItem(USER_KEY);
+    const token = tokenStore.getToken();
+    const raw = tokenStore.getUser();
     if (!token || !raw) return null;
     try {
       const payload = JSON.parse(atob(token.split(".")[1]!.replace(/-/g, "+").replace(/_/g, "/")));
       if (payload.exp && payload.exp * 1000 < Date.now()) throw new Error("expired");
     } catch {
-      localStorage.removeItem(TOKEN_KEY);
-      localStorage.removeItem(USER_KEY);
+      tokenStore.clear();
       return null;
     }
     const user = JSON.parse(raw) as { id: string; email: string; full_name: string; role: Role };
     return { session: { user: { id: user.id, email: user.email } }, role: user.role, name: user.full_name, isActive: true };
   },
   signOut: async () => {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
+    tokenStore.clear();
   },
 };
