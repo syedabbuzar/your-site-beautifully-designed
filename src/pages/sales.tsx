@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@/router-shim";
+import { confirmToast } from "@/lib/confirm-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -60,7 +61,7 @@ function Sales() {
     if (reason) run(() => api.cancelInvoice(i.id, reason), "Invoice cancelled and stock restored");
   };
   const remove = (i: Invoice) => {
-    if (confirm(`Delete ${i.invoice_number} permanently? Stock will be returned.`))
+    if (await confirmToast(`Delete ${i.invoice_number} permanently? Stock will be returned.`))
       run(() => api.deleteInvoice(i.id), "Invoice deleted");
   };
   const openEdit = async (i: Invoice) => {

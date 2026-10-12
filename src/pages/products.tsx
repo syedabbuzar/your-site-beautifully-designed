@@ -1,4 +1,5 @@
 import { createFileRoute } from "@/router-shim";
+import { confirmToast } from "@/lib/confirm-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -40,7 +41,7 @@ function Products() {
     } catch (e: any) { toast.error(e.message); }
   };
   const del = async (p: Product) => {
-    if (!confirm(`Delete ${p.name}? Products with sales history should be deactivated instead.`)) return;
+    if (!await confirmToast(`Delete ${p.name}? Products with sales history should be deactivated instead.`)) return;
     try { await api.deleteProduct(p.id); qc.invalidateQueries({ queryKey: ["products"] }); } catch { toast.error("Cannot delete — product has sales. Deactivate it instead."); }
   };
   const addCat = async () => {

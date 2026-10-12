@@ -1,4 +1,5 @@
 import { createFileRoute } from "@/router-shim";
+import { confirmToast } from "@/lib/confirm-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -112,7 +113,7 @@ function Purchases() {
     }
   };
   const deleteBill = async (bill: PurchaseBill) => {
-    if (!confirm(`Delete purchase bill ${bill.invoiceNumber}? This cannot be undone.`)) return;
+    if (!await confirmToast(`Delete purchase bill ${bill.invoiceNumber}? This cannot be undone.`)) return;
     try {
       await purchaseService.remove(bill.id);
       toast.success("Purchase bill deleted");
