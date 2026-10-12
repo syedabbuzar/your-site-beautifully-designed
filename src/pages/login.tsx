@@ -72,11 +72,6 @@ function Login() {
           <Button type="submit" className="w-full" disabled={busy}>
             {busy ? "Please wait…" : "Sign in"}
           </Button>
-          <div className="rounded-lg border bg-muted/40 p-3 text-xs text-muted-foreground">
-            <div className="mb-1 font-medium text-foreground">Demo accounts</div>
-            <div>Admin: admin@bombaysuiting.demo / admin123</div>
-            <div>Billing: billing@bombaysuiting.demo / billing123</div>
-          </div>
         </form>
       </div>
     </div>
