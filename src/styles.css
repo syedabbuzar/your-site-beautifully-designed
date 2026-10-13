@@ -152,3 +152,8 @@
   body { background: white; }
   @page { margin: 8mm; }
 }
+
+/* Tables scroll sideways inside panels on small screens instead of squashing. */
+@media (max-width: 767px) {
+  .glass-card table { min-width: 640px; }
+}
