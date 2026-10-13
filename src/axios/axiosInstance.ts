@@ -5,7 +5,15 @@ import { tokenStore } from "./tokenStore";
  *  same-origin "/api" proxy (vercel.json rewrite in production, Vite proxy in dev)
  *  so the browser never hits a CORS block. */
 export const BACKEND_URL = "https://bombay-backend-orcin.vercel.app";
+const desktopProxyParams = import.meta.env.MODE === "electron"
+  ? new URLSearchParams(window.location.search)
+  : null;
+const desktopProxyToken = desktopProxyParams?.get("apiToken");
 export const BASE_URL = "/api";
+
+if (desktopProxyParams && !desktopProxyToken) {
+  throw new Error("The Electron API proxy was not configured correctly.");
+}
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -16,6 +24,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use((config) => {
   const token = tokenStore.getToken();
   if (token) config.headers.Authorization = `Bearer ${token}`;
+  if (desktopProxyToken) config.headers.set("X-Desktop-Proxy-Token", desktopProxyToken);
   return config;
 });
 
@@ -24,7 +33,7 @@ axiosInstance.interceptors.response.use(
   (error: AxiosError<{ message?: string; errors?: { field?: string; message?: string }[] }>) => {
     if (error.response?.status === 401 && !error.config?.url?.includes("/auth/")) {
       tokenStore.clear();
-      if (!location.pathname.startsWith("/login")) location.href = "/login";
+      if (!location.hash.startsWith("#/login")) location.hash = "/login";
     }
     const fieldErr = error.response?.data?.errors?.[0];
     const message =

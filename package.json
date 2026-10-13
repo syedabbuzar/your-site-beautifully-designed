@@ -1,13 +1,19 @@
 {
   "name": "bombay-billing",
+  "description": "Billing and invoice management for Bombay Suiting & Shirting.",
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "main": "winrap/main.cjs",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "build:dev": "vite build --mode development"
+    "build:dev": "vite build --mode development",
+    "build:electron": "vite build --mode electron",
+    "electron:dev": "concurrently -k \"vite --host 127.0.0.1\" \"wait-on http://127.0.0.1:5173 && cross-env ELECTRON_RENDERER_URL=http://127.0.0.1:5173 electron .\"",
+    "electron:open": "npm run build:electron && electron .",
+    "electron:dist": "npm run build:electron && electron-builder --config winrap/electron-builder.yml --win nsis"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -67,6 +73,11 @@
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^5.2.0",
     "typescript": "^5.8.3",
-    "vite": "^7.1.0"
+    "vite": "^7.1.0",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^39.2.7",
+    "electron-builder": "^26.0.12",
+    "wait-on": "^8.0.4"
   }
 }

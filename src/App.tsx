@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import { Route as Index } from "./pages/index";
 import { Route as Login } from "./pages/login";
 import { Route as Layout } from "./pages/AppLayout";
@@ -26,7 +26,7 @@ function NotFound() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<Index.component />} />
         <Route path="/login" element={<Login.component />} />
@@ -45,6 +45,6 @@ export default function App() {
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }

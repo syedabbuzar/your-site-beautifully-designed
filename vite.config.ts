@@ -5,7 +5,8 @@ import path from "path";
 
 const BACKEND = "https://bombay-backend-orcin.vercel.app";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
+  base: mode === "electron" ? "./" : "/",
   plugins: [react(), tailwindcss()],
   resolve: { alias: { "@": path.resolve(__dirname, "./src") } },
   server: {
@@ -16,4 +17,4 @@ export default defineConfig({
   preview: {
     proxy: { "/api": { target: BACKEND, changeOrigin: true, secure: true } },
   },
-});
+}));

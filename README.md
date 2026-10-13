@@ -10,6 +10,17 @@ npm run dev
 npm run build
 ```
 
+## Electron for Windows
+
+Electron desktop files and the NSIS installer configuration are in `winrap/`.
+
+```sh
+npm install
+npm run electron:dev
+```
+
+To open the built desktop app without the Vite development server, run `npm run electron:open`. Build the Windows x64 installer with `npm run electron:dist`; the installer is written to `winrap/release/`. The Electron window uses hash-based routing and a local backend bridge, so API requests continue to work without the Vite or Vercel proxy.
+
 ## Demo accounts
 
 - Admin: `admin@bombaysuiting.demo` / `admin123`

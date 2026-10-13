@@ -1,0 +1,21 @@
+appId: com.bombaysuiting.billing
+productName: Bombay Billing
+directories:
+  output: winrap/release
+files:
+  - dist/**/*
+  - winrap/main.cjs
+  - package.json
+win:
+  icon: src/assets/bombay-suiting-shirting-exact-logo.ico
+  target:
+    target: nsis
+    arch:
+      - x64
+  artifactName: ${productName}-${version}-Setup.${ext}
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
