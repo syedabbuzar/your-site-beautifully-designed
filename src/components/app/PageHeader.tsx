@@ -2,10 +2,10 @@ import type { ReactNode } from "react";
 
 export function PageHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: ReactNode }) {
   return (
-    <div className="no-print mb-8 flex flex-wrap items-end justify-between gap-4">
+    <div className="no-print mb-6 flex sm:mb-8 flex-wrap items-end justify-between gap-4">
       <div>
         <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-gold">Bombay Suiting & Shirting</div>
-        <h1 className="text-4xl font-semibold text-primary md:text-5xl">{title}</h1>
+        <h1 className="text-3xl font-semibold text-primary sm:text-4xl md:text-5xl">{title}</h1>
         {subtitle && <p className="mt-2 text-sm text-muted-foreground">{subtitle}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
@@ -26,7 +26,7 @@ export function Stat({ label, value, hint }: { label: string; value: ReactNode; 
 
 export function Panel({ title, children, actions }: { title?: string; children: ReactNode; actions?: ReactNode }) {
   return (
-    <div className="glass-card rounded-2xl p-6">
+    <div className="glass-card min-w-0 overflow-x-auto rounded-2xl p-4 sm:p-6">
       {(title || actions) && (
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           {title && <h3 className="text-2xl font-semibold text-primary">{title}</h3>}
