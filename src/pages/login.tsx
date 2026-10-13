@@ -73,8 +73,8 @@ function Login() {
           <Button type="submit" className="w-full" disabled={busy}>
             {busy ? "Please wait…" : "Sign in"}
           </Button>
+          <PoweredBy className="pt-6" />
         </form>
-        <PoweredBy className="mt-8" />
       </div>
     </div>
   );
