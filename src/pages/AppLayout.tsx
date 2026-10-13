@@ -77,10 +77,11 @@ function AppLayout() {
         <div className="m-3 rounded-xl border border-sidebar-border bg-sidebar-accent/50 p-4">
           <div className="truncate text-sm font-medium text-sidebar-accent-foreground">{name}</div>
           <div className="mb-3 text-xs text-gold">{role === "admin" ? "Admin" : "Billing user"}</div>
-          <button onClick={signOut} className="flex items-center gap-2 text-xs text-sidebar-foreground/70 hover:text-sidebar-accent-foreground">
-            <LogOut className="h-3.5 w-3.5" /> Sign out
-          </button>
+          <Button onClick={signOut} className="w-full bg-gold-gradient font-bold text-sidebar-primary-foreground hover:opacity-90">
+            <LogOut className="mr-1 h-4 w-4" /> Sign out
+          </Button>
         </div>
+        <PoweredBy dark className="mb-4 px-3" />
       </aside>
       <main className="min-w-0 flex-1 p-6 lg:p-10">
         <Outlet />

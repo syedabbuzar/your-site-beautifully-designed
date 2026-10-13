@@ -73,6 +73,7 @@ function Login() {
             {busy ? "Please wait…" : "Sign in"}
           </Button>
         </form>
+        <PoweredBy className="mt-8" />
       </div>
     </div>
   );

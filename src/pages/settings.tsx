@@ -84,6 +84,14 @@ function SettingsPage() {
           </div>
         </Panel>
       </div>
+      <Panel title="GST Disclaimer">
+        <div className="space-y-3 text-sm leading-relaxed text-muted-foreground">
+          <p>This software has been developed by MellowMoon SoftTech Pvt. Ltd. according to the client's requirements and instructions. The business owner is responsible for verifying GST details, applicable tax rates, invoice information, and compliance with applicable GST laws.</p>
+          <p>The client is responsible for providing accurate business and tax information and confirming the appropriate GST configuration for their business. MellowMoon SoftTech Pvt. Ltd. does not provide tax or accounting advice. Clients should consult a qualified tax professional for GST-related guidance.</p>
+          <p>The software provider's liability, if any, shall be determined in accordance with applicable law.</p>
+        </div>
+        <PoweredBy className="mt-6" />
+      </Panel>
     </div>
   );
 }
