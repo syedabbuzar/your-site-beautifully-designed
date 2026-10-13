@@ -1,4 +1,5 @@
 import { createFileRoute } from "@/router-shim";
+import { PoweredBy } from "@/components/app/PoweredBy";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";

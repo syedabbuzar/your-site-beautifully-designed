@@ -1,4 +1,5 @@
 import { createFileRoute, Link, Navigate, Outlet, useLocation } from "@/router-shim";
+import { PoweredBy } from "@/components/app/PoweredBy";
 import {
   LayoutDashboard,
   Receipt,
