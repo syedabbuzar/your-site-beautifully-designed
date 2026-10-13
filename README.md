@@ -50,3 +50,15 @@ npx cap sync ios
 Windows can prepare and sync the project but cannot build or sign an iOS app. Complete the native build and signing on macOS with Xcode (or a compatible cloud Mac): open `ios/App/App.xcodeproj`, select the app target, set the Apple Developer Team and signing settings, then archive via **Product > Archive**. In Organizer, distribute the archive for the intended purpose (for example, TestFlight/App Store or ad hoc/device testing) and export the signed `.ipa`.
 
 To install and test on a friend's iPhone, register the device with the Apple Developer team and use an ad hoc signed build, or distribute through TestFlight and invite them. Install only the signed build using the corresponding provisioning profile/TestFlight invitation; verify login, API connectivity, billing, camera/printing workflows if used, and keyboard/safe-area behavior on the device. An iOS build and signed `.ipa` are not produced or tested on Windows.
+
+## Codemagic iOS / TestFlight
+
+The root-level `codemagic.yaml` defines a macOS workflow that installs the locked npm dependencies, builds and syncs the Capacitor iOS app, signs it for App Store distribution, creates an IPA, and uploads the build to TestFlight. Codemagic must scan this file from the repository root.
+
+Before running the workflow:
+
+1. In Codemagic, connect the repository and configure the Apple Developer Portal / App Store Connect integration with the exact reference name `bombay_app_store_connect` (or change the integration reference in `codemagic.yaml` to the name you configure).
+2. In Codemagic **Code signing identities**, make an Apple Distribution certificate and an App Store provisioning profile available for bundle ID `com.bombaysuiting.billing`. The workflow uses automatic profile selection for that bundle ID.
+3. Create the matching app record in App Store Connect before the first automated TestFlight upload, and ensure the selected API key has permission to upload builds.
+
+The workflow increments the iOS build number with Codemagic's `$BUILD_NUMBER`. TestFlight processing and external tester access remain subject to Apple's processing/review and tester invitation. The workflow does not automatically submit the app for App Store release.
