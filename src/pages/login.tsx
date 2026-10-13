@@ -1,4 +1,5 @@
 import { createFileRoute, Navigate } from "@/router-shim";
+import { PoweredBy } from "@/components/app/PoweredBy";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
@@ -73,6 +74,7 @@ function Login() {
             {busy ? "Please wait…" : "Sign in"}
           </Button>
         </form>
+        <PoweredBy className="mt-8" />
       </div>
     </div>
   );
