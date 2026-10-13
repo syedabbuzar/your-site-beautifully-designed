@@ -11,11 +11,16 @@
     "preview": "vite preview",
     "build:dev": "vite build --mode development",
     "build:electron": "vite build --mode electron",
+    "cap:sync": "npm run build && cap sync",
+    "ios:sync": "npm run build && cap sync ios",
+    "ios:open": "cap open ios",
     "electron:dev": "concurrently -k \"vite --host 127.0.0.1\" \"wait-on http://127.0.0.1:5173 && cross-env ELECTRON_RENDERER_URL=http://127.0.0.1:5173 electron .\"",
     "electron:open": "npm run build:electron && electron .",
     "electron:dist": "npm run build:electron && electron-builder --config winrap/electron-builder.yml --win nsis"
   },
   "dependencies": {
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/ios": "^8.5.3",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -54,7 +59,7 @@
     "input-otp": "^1.4.2",
     "lucide-react": "^0.575.0",
     "react": "^19.2.0",
-    "react-day-picker": "^9.14.0",
+    "react-day-picker": "9.13.0",
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.71.2",
     "react-resizable-panels": "^4.6.5",
@@ -68,16 +73,18 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.5.3",
     "@types/node": "^22.16.5",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^5.2.0",
-    "typescript": "^5.8.3",
-    "vite": "^7.1.0",
     "concurrently": "^9.2.1",
     "cross-env": "^10.1.0",
     "electron": "^39.2.7",
     "electron-builder": "^26.0.12",
+    "typescript": "^5.8.3",
+    "vite": "^7.1.0",
     "wait-on": "^8.0.4"
   }
 }

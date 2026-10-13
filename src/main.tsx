@@ -4,7 +4,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import App from "./App";
 import { AuthProvider } from "@/lib/auth";
 import { Toaster } from "@/components/ui/sonner";
+import { Capacitor } from "@capacitor/core";
 import "./styles.css";
+
+if (Capacitor.isNativePlatform()) {
+  document.documentElement.classList.add("capacitor-app");
+}
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } } });
 

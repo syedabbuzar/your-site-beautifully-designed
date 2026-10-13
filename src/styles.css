@@ -157,3 +157,36 @@
 @media (max-width: 767px) {
   .glass-card table { min-width: 640px; }
 }
+
+.capacitor-app body {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.capacitor-app aside.sidebar-sheen {
+  height: 100vh;
+  height: 100dvh;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.capacitor-app header.sidebar-sheen {
+  padding-top: calc(0.75rem + env(safe-area-inset-top));
+}
+
+.capacitor-app main {
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+}
+
+@media (max-width: 767px) {
+  .capacitor-app button,
+  .capacitor-app aside nav a {
+    min-height: 44px;
+  }
+
+  .capacitor-app input,
+  .capacitor-app select,
+  .capacitor-app textarea {
+    font-size: 16px;
+  }
+}

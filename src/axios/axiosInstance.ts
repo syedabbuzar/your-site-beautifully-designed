@@ -1,15 +1,14 @@
 import axios, { AxiosError } from "axios";
+import { Capacitor } from "@capacitor/core";
 import { tokenStore } from "./tokenStore";
 
-/** Real backend: https://bombay-backend-orcin.vercel.app — reached through the
- *  same-origin "/api" proxy (vercel.json rewrite in production, Vite proxy in dev)
- *  so the browser never hits a CORS block. */
+/** Browser requests use the same-origin proxy; native requests go to the HTTPS API. */
 export const BACKEND_URL = "https://bombay-backend-orcin.vercel.app";
 const desktopProxyParams = import.meta.env.MODE === "electron"
   ? new URLSearchParams(window.location.search)
   : null;
 const desktopProxyToken = desktopProxyParams?.get("apiToken");
-export const BASE_URL = "/api";
+export const BASE_URL = Capacitor.isNativePlatform() ? `${BACKEND_URL}/api` : "/api";
 
 if (desktopProxyParams && !desktopProxyToken) {
   throw new Error("The Electron API proxy was not configured correctly.");

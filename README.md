@@ -1,6 +1,6 @@
 # Bombay Suiting & Shirting — Billing & Invoices
 
-Frontend-only React 19, Vite, TypeScript and React Router application. The demo starts from JSON files in `src/data/`; `src/services/api.ts` provides the data contract used by the pages and persists demo changes in browser localStorage. No server, API, database, or network connection is required.
+React 19, Vite, TypeScript, and React Router billing application. Backend requests use the HTTPS Bombay backend; local web development proxies `/api` through Vite, and the production web deployment uses the `/api` rewrite in `vercel.json`. Capacitor's iOS build calls that HTTPS API directly.
 
 ## Run
 
@@ -21,11 +21,32 @@ npm run electron:dev
 
 To open the built desktop app without the Vite development server, run `npm run electron:open`. Build the Windows x64 installer with `npm run electron:dist`; the installer is written to `winrap/release/`. The Electron window uses hash-based routing and a local backend bridge, so API requests continue to work without the Vite or Vercel proxy.
 
-## Demo accounts
+## Authentication and API
 
-- Admin: `admin@bombaysuiting.demo` / `admin123`
-- Billing user: `billing@bombaysuiting.demo` / `billing123`
+Authentication and business data use the configured backend; user accounts must be provisioned there. API methods are in `src/services/api.ts`, and authentication state is managed in `src/lib/auth.tsx`. Keep their page-facing methods and result types stable when changing backend integration.
 
-Products (including purchase rates), invoices, stock levels, settings, and demo users are shared through the local service layer. Invoices support full item and payment edits, cancellation, and deletion. The dashboard supports date-range reports and an Excel-compatible low-stock CSV export. Browser data can be reset by clearing localStorage for the site (key: `bombay-billing-demo-data-v1`). Demo passwords and local sign-in are for prototyping only, not production security.
+## iOS with Capacitor
 
-To connect a future backend, replace the implementation in `src/services/api.ts` and `src/lib/auth.tsx` while keeping the page-facing service methods and result types stable. When hosting `dist/`, configure the host to send application routes to `index.html`.
+The app uses hash-based routing, so routes work in the bundled Capacitor WebView without server-side route fallback. Native requests use Capacitor's HTTPS native HTTP transport, while browser requests retain the same-origin API proxy. This avoids relying on the backend to permit arbitrary WebView origins and does not disable TLS or permit cleartext traffic. The exact supplied icon source is `resources/logo.png`; the original image is `src/assets/bombay-suiting-shirting-exact-logo.png`. Generated iOS icon assets are placed in `ios/App/App/Assets.xcassets/AppIcon.appiconset`.
+
+On Windows, install dependencies, build, and sync the project:
+
+```sh
+npm install
+npm run build
+npx cap sync
+```
+
+If no `ios` directory exists, add the native platform after installing dependencies:
+
+```sh
+npx cap add ios
+npx @capacitor/assets generate --ios --assetPath resources
+npx cap sync ios
+```
+
+`npm run cap:sync` builds the web app and syncs all installed native platforms; `npm run ios:sync` builds and syncs iOS only, and `npm run ios:open` opens the iOS project. Run the asset generation command after adding iOS and again if the supplied source icon changes.
+
+Windows can prepare and sync the project but cannot build or sign an iOS app. Complete the native build and signing on macOS with Xcode (or a compatible cloud Mac): open `ios/App/App.xcodeproj`, select the app target, set the Apple Developer Team and signing settings, then archive via **Product > Archive**. In Organizer, distribute the archive for the intended purpose (for example, TestFlight/App Store or ad hoc/device testing) and export the signed `.ipa`.
+
+To install and test on a friend's iPhone, register the device with the Apple Developer team and use an ad hoc signed build, or distribute through TestFlight and invite them. Install only the signed build using the corresponding provisioning profile/TestFlight invitation; verify login, API connectivity, billing, camera/printing workflows if used, and keyboard/safe-area behavior on the device. An iOS build and signed `.ipa` are not produced or tested on Windows.
