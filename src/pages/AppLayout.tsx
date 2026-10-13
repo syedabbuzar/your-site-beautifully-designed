@@ -1,4 +1,5 @@
 import { createFileRoute, Link, Navigate, Outlet, useLocation } from "@/router-shim";
+import { useState } from "react";
 import { PoweredBy } from "@/components/app/PoweredBy";
 import {
   LayoutDashboard,
@@ -12,6 +13,8 @@ import {
   UserCog,
   LogOut,
   History,
+  Menu,
+  X,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { Splash, Logo } from "@/components/app/Splash";
