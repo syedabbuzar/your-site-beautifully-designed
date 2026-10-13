@@ -37,6 +37,7 @@ const BILLING_ALLOWED = ["/billing", "/sales", "/invoice"];
 function AppLayout() {
   const { loading, session, role, isActive, name, signOut } = useAuth();
   const loc = useLocation();
+  const [open, setOpen] = useState(false);
   if (loading) return <Splash />;
   if (!session) return <Navigate to="/login" />;
   if (!isActive || !role)
@@ -53,13 +54,15 @@ function AppLayout() {
   const items = NAV.filter((n) => role === "admin" || !n.admin);
   return (
     <div className="app-backdrop flex min-h-screen">
-      <aside className="sidebar-sheen no-print sticky top-0 flex h-screen w-64 shrink-0 flex-col text-sidebar-foreground">
+      {open && <div className="no-print fixed inset-0 z-40 bg-foreground/50 lg:hidden" onClick={() => setOpen(false)} />}
+      <aside className={`sidebar-sheen no-print fixed inset-y-0 left-0 z-50 flex h-screen w-64 shrink-0 flex-col text-sidebar-foreground transition-transform lg:sticky lg:top-0 lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="flex items-center gap-3 px-5 py-6">
           <Logo className="h-12 w-12 ring-2 ring-gold/60 shadow-lg" />
-          <div className="leading-tight">
+          <div className="flex-1 leading-tight">
             <div className="font-display text-xl font-semibold tracking-[0.2em] text-sidebar-accent-foreground">BOMBAY</div>
             <div className="text-[9px] tracking-[0.25em] text-gold">SUITING • SHIRTING</div>
           </div>
+          <button aria-label="Close menu" className="lg:hidden" onClick={() => setOpen(false)}><X className="h-5 w-5" /></button>
         </div>
         <div className="gold-rule mx-5 mb-4" />
         <nav className="flex-1 space-y-1 overflow-y-auto px-3">
@@ -67,6 +70,7 @@ function AppLayout() {
             <Link
               key={n.to}
               to={n.to}
+              onClick={() => setOpen(false)}
               className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-sidebar-foreground/75 transition hover:translate-x-0.5 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               activeProps={{ className: "!bg-gold-gradient !text-sidebar-primary-foreground font-semibold shadow-md" }}
             >
@@ -84,9 +88,16 @@ function AppLayout() {
         </div>
         <PoweredBy dark className="mb-4 px-3" />
       </aside>
-      <main className="min-w-0 flex-1 p-6 lg:p-10">
-        <Outlet />
-      </main>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="sidebar-sheen no-print sticky top-0 z-30 flex items-center gap-3 px-4 py-3 text-sidebar-foreground lg:hidden">
+          <button aria-label="Open menu" onClick={() => setOpen(true)}><Menu className="h-6 w-6" /></button>
+          <Logo className="h-9 w-9 ring-1 ring-gold/60" />
+          <div className="font-display text-lg font-semibold tracking-[0.2em] text-sidebar-accent-foreground">BOMBAY</div>
+        </header>
+        <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-10">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }
