@@ -13,6 +13,8 @@ import {
   UserCog,
   LogOut,
   History,
+  Menu,
+  X,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { Splash, Logo } from "@/components/app/Splash";
