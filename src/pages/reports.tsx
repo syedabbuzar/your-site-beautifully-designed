@@ -85,17 +85,8 @@ function Reports() {
         <Stat label="Cancelled" value={invs.length - done.length} />
         <Stat
           label="Total profit"
-          value={
-            !validProfitRange ? "Select valid dates"
-              : profitQuery.isPending ? "Loading..."
-                : profitQuery.isError ? "Unavailable"
-                  : inr(profitQuery.data)
-          }
-          hint={
-            !validProfitRange ? "Choose a valid date range."
-              : profitQuery.isError ? <span className="text-destructive">{profitQuery.error.message}</span>
-                : "Calculated by the backend for this date range."
-          }
+          value={!validProfitRange ? "Select valid dates" : inr(profit)}
+          hint={!validProfitRange ? "Choose a valid date range." : "Sales − purchase cost − discounts."}
         />
       </div>
       <div className="grid gap-6 xl:grid-cols-2">
