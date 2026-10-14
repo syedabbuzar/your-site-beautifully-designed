@@ -142,14 +142,16 @@ export const api = {
 
   dashboard: async (from?: string, to?: string) => call(axiosInstance.get("/dashboard", { params: { from, to } })),
   reports: async (from?: string, to?: string) => call(axiosInstance.get("/reports", { params: { from, to } })),
+  /** GET /api/reports → { summary: { totalProfit, ... } } (call() already unwraps `data`). */
   totalProfit: async (from: string, to: string): Promise<number> => {
-    const report = await call<{ totalProfit: number }>(
-      axiosInstance.get("/reports/profit", { params: { from, to } }),
+    const report = await call<{ summary?: { totalProfit?: unknown } }>(
+      axiosInstance.get("/reports", { params: { from, to } }),
     );
-    if (typeof report?.totalProfit !== "number" || !Number.isFinite(report.totalProfit)) {
-      throw new Error("The total profit report returned an invalid amount.");
+    const value = report?.summary?.totalProfit;
+    if (typeof value !== "number" || !Number.isFinite(value)) {
+      throw new Error("The profit report returned an invalid amount.");
     }
-    return report.totalProfit;
+    return value;
   },
 
   profiles: userService.users,
