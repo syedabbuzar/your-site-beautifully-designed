@@ -4,9 +4,6 @@ const config: CapacitorConfig = {
   appId: "com.bombaysuiting.billing",
   appName: "Bombay Suiting & Shirting",
   webDir: "dist",
-  ios: {
-    contentInset: "never",
-  },
   plugins: {
     CapacitorHttp: {
       enabled: true,

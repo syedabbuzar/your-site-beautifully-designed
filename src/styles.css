@@ -178,6 +178,83 @@
   padding-bottom: calc(1rem + env(safe-area-inset-bottom));
 }
 
+.app-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  min-height: 100vh;
+  min-height: 100dvh;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(32rem 24rem at 50% 35%, oklch(0.32 0.07 262 / 70%), transparent 72%),
+    linear-gradient(160deg, oklch(0.2 0.055 262), oklch(0.13 0.04 262));
+  color: var(--sidebar-foreground);
+}
+
+.app-splash-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  text-align: center;
+  animation: splash-content-enter 700ms ease-out both;
+}
+
+.app-splash-logo {
+  width: 7.5rem;
+  height: 7.5rem;
+  border: 2px solid color-mix(in oklab, var(--gold) 75%, transparent);
+  border-radius: 9999px;
+  box-shadow: 0 0 2.5rem color-mix(in oklab, var(--gold) 20%, transparent);
+  animation: splash-logo-glow 1.8s ease-in-out infinite alternate;
+}
+
+.app-splash-title {
+  margin-top: 1.25rem;
+  color: var(--sidebar-accent-foreground);
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  letter-spacing: 0.28em;
+}
+
+.app-splash-subtitle {
+  margin-top: 0.2rem;
+  color: var(--gold);
+  font-size: 0.65rem;
+  letter-spacing: 0.28em;
+}
+
+.app-splash-subtitle span {
+  padding: 0 0.3rem;
+}
+
+.app-splash-divider {
+  width: min(16rem, 60vw);
+  height: 1px;
+  margin: 1.5rem 0;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.app-splash-powered {
+  gap: 0.4rem;
+}
+
+.app-splash-powered img {
+  height: 3.5rem;
+}
+
+@keyframes splash-content-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes splash-logo-glow {
+  from { box-shadow: 0 0 1.25rem color-mix(in oklab, var(--gold) 14%, transparent); }
+  to { box-shadow: 0 0 2.5rem color-mix(in oklab, var(--gold) 35%, transparent); }
+}
+
 @media (max-width: 767px) {
   .capacitor-app button,
   .capacitor-app aside nav a {
@@ -188,5 +265,63 @@
   .capacitor-app select,
   .capacitor-app textarea {
     font-size: 16px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .app-layout-main {
+    padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+  }
+
+  .mobile-bottom-nav {
+    position: fixed;
+    z-index: 30;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    justify-content: space-around;
+    border-top: 1px solid oklch(0.34 0.045 262 / 70%);
+    background: oklch(0.16 0.045 262 / 98%);
+    padding: 0.45rem 0.2rem calc(0.35rem + env(safe-area-inset-bottom));
+    color: oklch(0.68 0.018 260);
+    backdrop-filter: blur(16px);
+  }
+
+  .mobile-bottom-nav-item {
+    display: flex;
+    min-width: 0;
+    min-height: 3.5rem;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    border: 0;
+    border-radius: 0.65rem;
+    background: transparent;
+    color: inherit;
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-bottom-nav-item.is-active {
+    color: var(--gold);
+  }
+
+  .mobile-bottom-nav-item:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: -2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-splash-content,
+  .app-splash-logo {
+    animation: none;
   }
 }

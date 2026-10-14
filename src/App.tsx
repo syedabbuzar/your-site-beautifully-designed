@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import { HashRouter, Routes, Route } from "react-router-dom";
+import { Splash } from "@/components/app/Splash";
 import { Route as Index } from "./pages/index";
 import { Route as Login } from "./pages/login";
 import { Route as Layout } from "./pages/AppLayout";
@@ -25,6 +27,15 @@ function NotFound() {
 }
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => setShowSplash(false), 1900);
+    return () => window.clearTimeout(timeoutId);
+  }, []);
+
+  if (showSplash) return <Splash />;
+
   return (
     <HashRouter>
       <Routes>

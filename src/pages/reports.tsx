@@ -13,16 +13,23 @@ export const Route = createFileRoute("/_app/reports")({
   component: Reports,
 });
 
-const iso = (d: Date) => d.toISOString().slice(0, 10);
+const iso = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
 function Reports() {
   const [from, setFrom] = useState(iso(new Date(new Date().getFullYear(), new Date().getMonth(), 1)));
   const [to, setTo] = useState(iso(new Date()));
   const fromTs = new Date(from + "T00:00:00").toISOString();
-  const toTs = new Date(to + "T23:59:59").toISOString();
+  const toTs = new Date(to + "T23:59:59.999").toISOString();
+  const validProfitRange = Boolean(from && to && from <= to);
   const { data: invs = [] } = useQuery({ queryKey: ["invoices", fromTs, toTs], queryFn: () => api.invoices(fromTs, toTs) });
   const { data: items = [] } = useQuery({ queryKey: ["items", fromTs], queryFn: () => api.invoiceItems(fromTs) });
   const { data: users = [] } = useQuery({ queryKey: ["profiles"], queryFn: api.profiles });
+  const profitQuery = useQuery({
+    queryKey: ["reports", "total-profit", from, to],
+    queryFn: () => api.totalProfit(fromTs, toTs),
+    enabled: validProfitRange,
+  });
 
   const done = invs.filter((i) => i.status === "completed");
   const its = items.filter((i) => i.invoices.status === "completed" && i.invoices.created_at <= toTs);
@@ -56,16 +63,30 @@ function Reports() {
   return (
     <div className="space-y-6">
       <PageHeader title="Reports" actions={<>
-        <div><Label className="text-xs">From</Label><Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></div>
-        <div><Label className="text-xs">To</Label><Input type="date" value={to} onChange={(e) => setTo(e.target.value)} /></div>
+        <div><Label className="text-xs">From</Label><Input type="date" value={from} max={to || undefined} onChange={(e) => setFrom(e.target.value)} /></div>
+        <div><Label className="text-xs">To</Label><Input type="date" value={to} min={from || undefined} onChange={(e) => setTo(e.target.value)} /></div>
         <Button variant="outline" className="self-end" onClick={exportCsv}>Export CSV</Button>
         <Button variant="outline" className="self-end" onClick={() => window.print()}>Print</Button>
       </>} />
-      <div className="grid gap-4 sm:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         <Stat label="Net sales" value={inr(total)} hint={`${done.length} invoices`} />
         <Stat label="Discounts given" value={inr(disc)} />
         <Stat label="GST collected" value={inr(gst)} />
         <Stat label="Cancelled" value={invs.length - done.length} />
+        <Stat
+          label="Total profit"
+          value={
+            !validProfitRange ? "Select valid dates"
+              : profitQuery.isPending ? "Loading..."
+                : profitQuery.isError ? "Unavailable"
+                  : inr(profitQuery.data)
+          }
+          hint={
+            !validProfitRange ? "Choose a valid date range."
+              : profitQuery.isError ? <span className="text-destructive">{profitQuery.error.message}</span>
+                : "Calculated by the backend for this date range."
+          }
+        />
       </div>
       <div className="grid gap-6 xl:grid-cols-2">
         <Panel title="Product sales">

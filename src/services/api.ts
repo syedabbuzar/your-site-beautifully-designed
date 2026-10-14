@@ -142,6 +142,15 @@ export const api = {
 
   dashboard: async (from?: string, to?: string) => call(axiosInstance.get("/dashboard", { params: { from, to } })),
   reports: async (from?: string, to?: string) => call(axiosInstance.get("/reports", { params: { from, to } })),
+  totalProfit: async (from: string, to: string): Promise<number> => {
+    const report = await call<{ totalProfit: number }>(
+      axiosInstance.get("/reports/profit", { params: { from, to } }),
+    );
+    if (typeof report?.totalProfit !== "number" || !Number.isFinite(report.totalProfit)) {
+      throw new Error("The total profit report returned an invalid amount.");
+    }
+    return report.totalProfit;
+  },
 
   profiles: userService.users,
   createUser: userService.create,
