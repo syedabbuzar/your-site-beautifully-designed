@@ -25,6 +25,7 @@ function Reports() {
   const { data: invs = [] } = useQuery({ queryKey: ["invoices", fromTs, toTs], queryFn: () => api.invoices(fromTs, toTs) });
   const { data: items = [] } = useQuery({ queryKey: ["items", fromTs], queryFn: () => api.invoiceItems(fromTs) });
   const { data: users = [] } = useQuery({ queryKey: ["profiles"], queryFn: api.profiles });
+  const { data: products = [] } = useQuery({ queryKey: ["products"], queryFn: api.products });
   const profitQuery = useQuery({
     queryKey: ["reports", "total-profit", from, to],
     queryFn: () => api.totalProfit(fromTs, toTs),
@@ -36,6 +37,15 @@ function Reports() {
   const total = round2(done.reduce((s, i) => s + Number(i.grand_total), 0));
   const disc = round2(done.reduce((s, i) => s + Number(i.discount_amount), 0));
   const gst = round2(done.reduce((s, i) => s + Number(i.gst_amount), 0));
+  // Profit = line revenue − purchase cost − invoice discounts (purchase rate saved on the bill, else product's).
+  const costOf = (i: (typeof its)[number]) => {
+    const saved = Number((i as any).purchase_rate);
+    const rate = Number.isFinite(saved) && saved > 0 ? saved : Number(products.find((p) => p.id === i.product_id)?.purchase_rate ?? 0);
+    return rate * Number(i.quantity);
+  };
+  const localProfit = round2(its.reduce((s, i) => s + Number(i.amount) - costOf(i), 0) - disc);
+  const backendProfit = profitQuery.data;
+  const profit = backendProfit && backendProfit !== 0 ? backendProfit : localProfit;
 
   const group = <T,>(arr: T[], key: (x: T) => string, val: (x: T) => number[]) => {
     const m = new Map<string, number[]>();
@@ -75,17 +85,8 @@ function Reports() {
         <Stat label="Cancelled" value={invs.length - done.length} />
         <Stat
           label="Total profit"
-          value={
-            !validProfitRange ? "Select valid dates"
-              : profitQuery.isPending ? "Loading..."
-                : profitQuery.isError ? "Unavailable"
-                  : inr(profitQuery.data)
-          }
-          hint={
-            !validProfitRange ? "Choose a valid date range."
-              : profitQuery.isError ? <span className="text-destructive">{profitQuery.error.message}</span>
-                : "Calculated by the backend for this date range."
-          }
+          value={!validProfitRange ? "Select valid dates" : inr(profit)}
+          hint={!validProfitRange ? "Choose a valid date range." : "Sales − purchase cost − discounts."}
         />
       </div>
       <div className="grid gap-6 xl:grid-cols-2">
