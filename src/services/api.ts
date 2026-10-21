@@ -129,7 +129,32 @@ export const api = {
   }) => call(axiosInstance.put(`/invoices/${invoiceId}`, { customer_id: null, ...details })),
   cancelInvoice: async (invoiceId: string, reason: string) =>
     call(axiosInstance.patch(`/invoices/${invoiceId}/cancel`, { cancel_reason: reason })),
-  deleteInvoice: async (invoiceId: string) => call(axiosInstance.delete(`/invoices/${invoiceId}`)),
+  deleteInvoice: async (invoiceId: string) => {
+    const paidAmounts = await api.invoicePaidAmounts();
+    const paidAmount = Number(paidAmounts[invoiceId] ?? 0);
+    if (!Number.isFinite(paidAmount) || paidAmount < 0) {
+      throw new Error("The invoice has an invalid recorded payment amount.");
+    }
+
+    if (paidAmount > 0) await api.setInvoicePaidAmount(invoiceId, 0);
+
+    try {
+      return await call(axiosInstance.delete(`/invoices/${invoiceId}`));
+    } catch (deleteError) {
+      if (paidAmount > 0) {
+        try {
+          await api.setInvoicePaidAmount(invoiceId, paidAmount);
+        } catch (restoreError) {
+          const deleteMessage = deleteError instanceof Error ? deleteError.message : "Unknown error";
+          const restoreMessage = restoreError instanceof Error ? restoreError.message : "Unknown error";
+          throw new Error(
+            `Invoice deletion failed: ${deleteMessage}. Its payment could not be restored: ${restoreMessage}. Verify the payment details before retrying.`,
+          );
+        }
+      }
+      throw deleteError;
+    }
+  },
   invoices: async (from?: string, to?: string): Promise<Invoice[]> =>
     call(axiosInstance.get("/invoices", { params: { from: iso(from), to: iso(to) } })),
   invoice: async (invoiceId: string): Promise<StoredInvoice> => {

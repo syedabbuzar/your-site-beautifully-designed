@@ -61,8 +61,16 @@ function Sales() {
       run(() => api.cancelInvoice(i.id, "Cancelled by staff"), "Invoice cancelled and stock restored");
   };
   const remove = async (i: Invoice) => {
-    if (await confirmToast(`Delete ${i.invoice_number} permanently? Stock will be returned.`))
-      run(() => api.deleteInvoice(i.id), "Invoice deleted");
+    if (await confirmToast(`Delete ${i.invoice_number} permanently? Stock will be returned and any recorded payment will be removed.`)) {
+      try {
+        await api.deleteInvoice(i.id);
+        toast.success("Invoice deleted");
+        qc.invalidateQueries();
+      } catch (e: unknown) {
+        qc.invalidateQueries({ queryKey: ["invoice-paid-amounts"] });
+        toast.error(e instanceof Error ? e.message : "Unable to delete invoice.");
+      }
+    }
   };
   const openEdit = async (i: Invoice) => {
     setEditLoading(true);
