@@ -153,9 +153,39 @@
   @page { margin: 8mm; }
 }
 
-/* Tables scroll sideways inside panels on small screens instead of squashing. */
+/* Tables scroll inside their own containers on small screens instead of stretching panels. */
 @media (max-width: 767px) {
+  body {
+    font-size: 16px;
+  }
+
+  .app-layout-main {
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+
   .glass-card table { min-width: 640px; }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  .overflow-x-auto {
+    max-width: 100%;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  header.sidebar-sheen {
+    padding-top: calc(0.75rem + env(safe-area-inset-top));
+  }
+
+  .mobile-bottom-nav {
+    padding-right: max(0.5rem, env(safe-area-inset-right));
+    padding-left: max(0.5rem, env(safe-area-inset-left));
+  }
 }
 
 .capacitor-app body {

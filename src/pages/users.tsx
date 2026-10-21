@@ -41,20 +41,22 @@ function Users() {
         </div>
       </Panel>
       <Panel title="Team">
-        <table className="w-full text-sm">
-          <thead className="text-left text-xs uppercase text-muted-foreground"><tr><th className="py-2">Name</th><th>Email</th><th>Role</th><th>Active</th><th /></tr></thead>
-          <tbody>{users.map((u) => (
-            <tr key={u.id} className="border-t">
-              <td className="py-2 font-medium">{u.full_name || "—"}</td><td>{u.email}</td>
-              <td>
-                <Select value={u.role ?? "billing"} onValueChange={(v) => run(() => updateStaffUser({ data: { user_id: u.id, role: v as any } }), "Role updated")}>
-                  <SelectTrigger className="h-8 w-36"><SelectValue /></SelectTrigger>
-                  <SelectContent><SelectItem value="billing">Billing user</SelectItem><SelectItem value="admin">Admin</SelectItem></SelectContent></Select>
-              </td>
-              <td><Switch checked={u.is_active} onCheckedChange={(v) => run(() => updateStaffUser({ data: { user_id: u.id, is_active: v } }), v ? "Activated" : "Deactivated")} /> {!u.is_active && <Badge variant="outline" className="ml-2">Inactive</Badge>}</td>
-              <td className="text-right"><Button size="sm" variant="ghost" onClick={() => { const p = prompt("New password (min 6 characters)"); if (p) run(() => updateStaffUser({ data: { user_id: u.id, password: p } }), "Password reset"); }}>Reset password</Button></td>
-            </tr>))}</tbody>
-        </table>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[680px] text-sm">
+            <thead className="text-left text-xs uppercase text-muted-foreground"><tr><th className="py-2">Name</th><th>Email</th><th>Role</th><th>Active</th><th /></tr></thead>
+            <tbody>{users.map((u) => (
+              <tr key={u.id} className="border-t">
+                <td className="py-2 font-medium">{u.full_name || "—"}</td><td>{u.email}</td>
+                <td>
+                  <Select value={u.role ?? "billing"} onValueChange={(v) => run(() => updateStaffUser({ data: { user_id: u.id, role: v as any } }), "Role updated")}>
+                    <SelectTrigger className="h-8 w-36"><SelectValue /></SelectTrigger>
+                    <SelectContent><SelectItem value="billing">Billing user</SelectItem><SelectItem value="admin">Admin</SelectItem></SelectContent></Select>
+                </td>
+                <td><div className="flex items-center gap-2"><Switch checked={u.is_active} onCheckedChange={(v) => run(() => updateStaffUser({ data: { user_id: u.id, is_active: v } }), v ? "Activated" : "Deactivated")} /> {!u.is_active && <Badge variant="outline">Inactive</Badge>}</div></td>
+                <td className="text-right"><Button size="sm" variant="ghost" onClick={() => { const p = prompt("New password (min 6 characters)"); if (p) run(() => updateStaffUser({ data: { user_id: u.id, password: p } }), "Password reset"); }}>Reset password</Button></td>
+              </tr>))}</tbody>
+          </table>
+        </div>
       </Panel>
     </div>
   );

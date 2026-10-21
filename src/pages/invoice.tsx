@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Printer, ArrowLeft } from "lucide-react";
 import { api } from "@/services/api";
 import { inr } from "@/lib/billing";
-import { loadInvoicePaidAmounts, paidAmountForInvoice } from "@/lib/invoice-payments";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/app/Splash";
 
@@ -21,12 +20,14 @@ function InvoiceView() {
   const [layout, setLayout] = useState<Layout>("a4");
   const { data } = useQuery({ queryKey: ["invoice", id], queryFn: () => api.invoice(id) });
   const { data: s } = useQuery({ queryKey: ["settings"], queryFn: api.settings });
-  const paymentQuery = useQuery({ queryKey: ["invoice-paid-amounts"], queryFn: loadInvoicePaidAmounts });
-  const paidAmounts = paymentQuery.data ?? {};
-  if (!data || !s) return <p className="text-muted-foreground">Loading invoice…</p>;
-  if (paymentQuery.isError) return <p className="text-destructive">Unable to load saved payment details: {paymentQuery.error instanceof Error ? paymentQuery.error.message : "Unknown error"}</p>;
+  const paymentQuery = useQuery({ queryKey: ["invoice-paid-amounts"], queryFn: api.invoicePaidAmounts });
+  if (!data || !s || paymentQuery.isPending) return <p className="text-muted-foreground">Loading invoice…</p>;
+  if (paymentQuery.isError) return <p className="text-destructive">Unable to load payment details: {paymentQuery.error instanceof Error ? paymentQuery.error.message : "Unknown error"}</p>;
   const { inv, items } = data;
-  const paidAmount = Math.min(Number(inv.grand_total), paidAmountForInvoice(inv, paidAmounts));
+  const paidAmount = Math.min(
+    Number(inv.grand_total),
+    paymentQuery.data[inv.id] ?? 0,
+  );
   const pendingAmount = Math.max(0, Number(inv.grand_total) - paidAmount);
   const thermal = layout !== "a4";
 
@@ -58,7 +59,8 @@ function InvoiceView() {
           <div><b>Invoice:</b> {inv.invoice_number}<br /><b>Date:</b> {new Date(inv.created_at).toLocaleString("en-IN")}</div>
           <div className="text-right"><b>Customer:</b> {inv.customer_name || "Walk-in"}<br />{inv.customer_mobile && <>Mobile: {inv.customer_mobile}</>}</div>
         </div>
-        <table className="mt-4 w-full">
+        <div className="-mx-1 mt-4 overflow-x-auto">
+        <table className="w-full min-w-[460px]">
           <thead className="border-b text-left">
             <tr><th className="py-1">Item</th><th className="text-right">Qty</th><th className="text-right">Rate</th><th className="text-right">Amount</th></tr>
           </thead>
@@ -73,6 +75,7 @@ function InvoiceView() {
             ))}
           </tbody>
         </table>
+        </div>
         <div className="ml-auto mt-3 w-full max-w-xs space-y-1">
           <Row k="Subtotal" v={inr(inv.subtotal)} />
           {Number(inv.discount_amount) > 0 && <Row k={`Discount${inv.discount_type === "percent" ? ` (${inv.discount_value}%)` : ""}`} v={`− ${inr(inv.discount_amount)}`} />}

@@ -7,6 +7,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { Capacitor } from "@capacitor/core";
 import "./styles.css";
 
+localStorage.removeItem("bombay-invoice-paid-amounts");
+
 if (Capacitor.isNativePlatform()) {
   document.documentElement.classList.add("capacitor-app");
 }

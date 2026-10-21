@@ -109,11 +109,13 @@ function Dashboard() {
       </div>
       <div className="grid gap-6 xl:grid-cols-2">
         <Panel title="Top products">
-          <table className="w-full text-sm">
-            <thead className="text-left text-xs uppercase text-muted-foreground"><tr><th className="py-1">Product</th><th className="text-right">Meters</th><th className="text-right">Revenue</th></tr></thead>
-            <tbody>{top.map((t) => <tr key={t.name} className="border-t"><td className="py-2">{t.name}</td><td className="num text-right">{meters(t.qty)}</td><td className="num text-right font-semibold">{inr(t.rev)}</td></tr>)}
-              {!top.length && <tr><td colSpan={3} className="py-6 text-center text-muted-foreground">No sales yet.</td></tr>}</tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[460px] text-sm">
+              <thead className="text-left text-xs uppercase text-muted-foreground"><tr><th className="py-1">Product</th><th className="text-right">Meters</th><th className="text-right">Revenue</th></tr></thead>
+              <tbody>{top.map((t) => <tr key={t.name} className="border-t"><td className="py-2">{t.name}</td><td className="num text-right">{meters(t.qty)}</td><td className="num text-right font-semibold">{inr(t.rev)}</td></tr>)}
+                {!top.length && <tr><td colSpan={3} className="py-6 text-center text-muted-foreground">No sales yet.</td></tr>}</tbody>
+            </table>
+          </div>
         </Panel>
         <Panel title="Low stock alerts" actions={<Button variant="outline" size="sm" onClick={exportLowStock}>Export Excel (.csv)</Button>}>
           {low.length ? low.map((p) => (

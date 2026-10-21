@@ -5,7 +5,6 @@ import { toast } from "sonner";
 import { Search, Trash2, Plus, X } from "lucide-react";
 import { api, type Product } from "@/services/api";
 import { computeTotals, inr, lineAmount, meters, round2 } from "@/lib/billing";
-import { saveInvoicePaidAmount } from "@/lib/invoice-payments";
 import { useAuth } from "@/lib/auth";
 import { PageHeader, Panel } from "@/components/app/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -96,10 +95,15 @@ function Billing() {
         discount_value: canDiscount ? round2(Number(discVal) || 0) : 0,
         items: rows.map((r) => ({ product_id: r.product.id, quantity: round2(Number(r.quantity)), rate: round2(Number(r.rate)) })),
       });
-      try {
-        saveInvoicePaidAmount(id, paidAmount);
-      } catch (error) {
-        toast.error(`Invoice created, but payment details could not be saved: ${error instanceof Error ? error.message : "Unknown error"}`);
+      if (paidAmount > 0) {
+        try {
+          await api.setInvoicePaidAmount(id, paidAmount);
+        } catch (error) {
+          toast.error(`Invoice created, but its initial payment could not be recorded: ${error instanceof Error ? error.message : "Unknown error"}. Record it from Customer Pending.`);
+          qc.invalidateQueries();
+          nav({ to: "/invoice/$id", params: { id } });
+          return;
+        }
       }
       toast.success("Invoice created");
       qc.invalidateQueries();

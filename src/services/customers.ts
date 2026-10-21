@@ -10,6 +10,27 @@ export interface CustomerRecord {
   updatedAt: string;
 }
 
+export interface PendingInvoiceRecord {
+  id: string;
+  invoice_number: string;
+  created_at: string;
+  total: number;
+  paid_amount: number;
+  pending_amount: number;
+}
+
+export interface PendingCustomerRecord {
+  id: string;
+  name: string;
+  mobile: string;
+  bills: number;
+  pending_bills: number;
+  total_billed: number;
+  paid_amount: number;
+  pending_amount: number;
+  invoices: PendingInvoiceRecord[];
+}
+
 function validate(name: string, mobile: string) {
   if (!name.trim()) throw new Error("Customer name is required.");
   if (mobile.trim() && !/^[+\d\s()-]{7,20}$/.test(mobile.trim()))
@@ -42,6 +63,8 @@ export const customerService = {
     const data = await call<any[]>(axiosInstance.get("/customers"));
     return data.map((c) => toRecord(c, invoices)).sort((a, b) => a.name.localeCompare(b.name));
   },
+  pending: async (): Promise<PendingCustomerRecord[]> =>
+    call(axiosInstance.get("/customers/pending")),
   get: async (id: string): Promise<CustomerRecord> => toRecord(await call(axiosInstance.get(`/customers/${id}`))),
   create: async (input: { name: string; mobile: string }): Promise<CustomerRecord> => {
     validate(input.name, input.mobile);

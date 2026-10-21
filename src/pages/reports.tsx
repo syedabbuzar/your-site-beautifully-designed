@@ -105,10 +105,12 @@ function Reports() {
 
 function T({ head, rows }: { head: string[]; rows: string[][] }) {
   return (
-    <table className="w-full text-sm">
-      <thead className="text-left text-xs uppercase text-muted-foreground"><tr>{head.map((h, i) => <th key={h} className={`py-1 ${i ? "text-right" : ""}`}>{h}</th>)}</tr></thead>
-      <tbody>{rows.map((r, i) => <tr key={i} className="border-t">{r.map((c, j) => <td key={j} className={`py-2 ${j ? "num text-right" : ""}`}>{c}</td>)}</tr>)}
-        {!rows.length && <tr><td colSpan={head.length} className="py-6 text-center text-muted-foreground">No data for this period.</td></tr>}</tbody>
-    </table>
+    <div className="overflow-x-auto">
+      <table className="w-full min-w-[520px] text-sm">
+        <thead className="text-left text-xs uppercase text-muted-foreground"><tr>{head.map((h, i) => <th key={h} className={`py-1 ${i ? "text-right" : ""}`}>{h}</th>)}</tr></thead>
+        <tbody>{rows.map((r, i) => <tr key={i} className="border-t">{r.map((c, j) => <td key={j} className={`py-2 ${j ? "num text-right" : ""}`}>{c}</td>)}</tr>)}
+          {!rows.length && <tr><td colSpan={head.length} className="py-6 text-center text-muted-foreground">No data for this period.</td></tr>}</tbody>
+      </table>
+    </div>
   );
 }

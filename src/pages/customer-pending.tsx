@@ -4,10 +4,9 @@ import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Pencil, Plus, Search, Trash2, Wallet } from "lucide-react";
-import { api, type Invoice } from "@/services/api";
+import { api } from "@/services/api";
 import { customerService, type CustomerRecord } from "@/services/customers";
 import { inr, round2 } from "@/lib/billing";
-import { loadInvoicePaidAmounts, paidAmountForInvoice, saveInvoicePaidAmount } from "@/lib/invoice-payments";
 import { useAuth } from "@/lib/auth";
 import { PageHeader, Panel, Stat } from "@/components/app/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -21,7 +20,13 @@ export const Route = createFileRoute("/_app/customer-pending")({
 });
 
 interface BillBalance {
-  invoice: Invoice;
+  invoice: {
+    id: string;
+    invoice_number: string;
+    created_at: string;
+    grand_total: number;
+    customer_name: string;
+  };
   paid: number;
   pending: number;
 }
@@ -37,48 +42,23 @@ interface CustomerBalance {
   pending: number;
 }
 
-function customerKey(name: string, mobile: string) {
-  const normalizedMobile = mobile.replace(/\D/g, "");
-  return normalizedMobile ? `mobile:${normalizedMobile}` : `name:${name.trim().toLowerCase()}`;
-}
-
-function makeBalance(key: string, name: string, mobile: string, invoices: Invoice[], record?: CustomerRecord, paidAmounts: Record<string, number> = {}): CustomerBalance {
-  const bills = invoices.map((invoice) => {
-    const total = Number(invoice.grand_total);
-    const paid = Math.min(total, paidAmountForInvoice(invoice, paidAmounts));
-    return { invoice, paid, pending: round2(Math.max(0, total - paid)) };
-  });
-  return {
-    key,
-    record,
-    name: name || "Customer",
-    mobile,
-    bills,
-    total: round2(bills.reduce((sum, bill) => sum + Number(bill.invoice.grand_total), 0)),
-    paid: round2(bills.reduce((sum, bill) => sum + bill.paid, 0)),
-    pending: round2(bills.reduce((sum, bill) => sum + bill.pending, 0)),
-  };
-}
-
 function CustomerPending() {
   const { role } = useAuth();
   const isAdmin = role === "admin";
   const queryClient = useQueryClient();
-  const { data: invoices = [], isError, error } = useQuery({ queryKey: ["invoices"], queryFn: () => api.invoices() });
-  const invoiceKey = invoices.map((invoice) => invoice.id).join(",");
+  const {
+    data: pendingCustomers = [],
+    isError,
+    error,
+  } = useQuery({ queryKey: ["pending-customers"], queryFn: customerService.pending });
   const {
     data: customerRecords = [],
     isError: customersError,
     error: customerError,
   } = useQuery({
-    queryKey: ["customers", invoiceKey],
-    queryFn: () => customerService.list(invoices),
+    queryKey: ["customers"],
+    queryFn: () => customerService.list([]),
   });
-  const {
-    data: paidAmounts = {},
-    isError: paymentsError,
-    error: paymentError,
-  } = useQuery({ queryKey: ["invoice-paid-amounts"], queryFn: loadInvoicePaidAmounts });
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState<CustomerRecord | null>(null);
   const [customerFormOpen, setCustomerFormOpen] = useState(false);
@@ -90,32 +70,38 @@ function CustomerPending() {
   const [savingPayment, setSavingPayment] = useState(false);
 
   const customers = useMemo(() => {
-    const completed = invoices.filter((invoice) => invoice.status === "completed");
-    const usedInvoiceIds = new Set<string>();
-    const result = customerRecords.map((record) => {
-      const bills = record.invoiceIds
-        .map((id) => completed.find((invoice) => invoice.id === id))
-        .filter((invoice): invoice is Invoice => !!invoice && !usedInvoiceIds.has(invoice.id));
-      bills.forEach((invoice) => usedInvoiceIds.add(invoice.id));
-      return makeBalance(`customer:${record.id}`, record.name, record.mobile, bills, record, paidAmounts);
-    });
-
-    const unregistered = new Map<string, { name: string; mobile: string; invoices: Invoice[] }>();
-    for (const invoice of completed) {
-      if (usedInvoiceIds.has(invoice.id)) continue;
-      const name = (invoice.customer_name ?? "").trim();
-      const mobile = (invoice.customer_mobile ?? "").trim();
-      if (!name && !mobile) continue;
-      const key = customerKey(name, mobile);
-      const group = unregistered.get(key) ?? { name, mobile, invoices: [] };
-      group.invoices.push(invoice);
-      unregistered.set(key, group);
-    }
-    for (const [key, group] of unregistered) {
-      result.push(makeBalance(`bills:${key}`, group.name, group.mobile, group.invoices, undefined, paidAmounts));
-    }
-    return result.sort((a, b) => b.pending - a.pending || a.name.localeCompare(b.name));
-  }, [customerRecords, invoices, paidAmounts]);
+    const recordsById = new Map(customerRecords.map((record) => [record.id, record]));
+    return pendingCustomers
+      .map((customer) => {
+        const bills = customer.invoices.map((invoice) => {
+          const total = Number(invoice.total);
+          const paid = Math.min(total, Number(invoice.paid_amount));
+          return {
+            invoice: {
+              id: invoice.id,
+              invoice_number: invoice.invoice_number,
+              created_at: invoice.created_at,
+              grand_total: total,
+              customer_name: customer.name,
+            },
+            paid,
+            pending: round2(Math.max(0, total - paid)),
+          };
+        }).filter((bill) => bill.pending > 0);
+        return {
+          key: `customer:${customer.id}`,
+          record: recordsById.get(customer.id),
+          name: customer.name || "Customer",
+          mobile: customer.mobile,
+          bills,
+          total: round2(bills.reduce((sum, bill) => sum + bill.invoice.grand_total, 0)),
+          paid: round2(bills.reduce((sum, bill) => sum + bill.paid, 0)),
+          pending: round2(bills.reduce((sum, bill) => sum + bill.pending, 0)),
+        };
+      })
+      .filter((customer) => customer.pending > 0)
+      .sort((a, b) => b.pending - a.pending || a.name.localeCompare(b.name));
+  }, [customerRecords, pendingCustomers]);
 
   const query = search.trim().toLowerCase();
   const visible = customers.filter((customer) =>
@@ -177,10 +163,14 @@ function CustomerPending() {
     }
     setSavingPayment(true);
     try {
-      saveInvoicePaidAmount(paymentBill.invoice.id, round2(paymentBill.paid + amount));
+      const paidAmount = round2(paymentBill.paid + amount);
+      await api.setInvoicePaidAmount(paymentBill.invoice.id, paidAmount);
       toast.success("Payment recorded");
       setPaymentBill(null);
-      await queryClient.invalidateQueries({ queryKey: ["invoice-paid-amounts"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["pending-customers"] }),
+        queryClient.invalidateQueries({ queryKey: ["invoice-paid-amounts"] }),
+      ]);
     } catch (caught) {
       toast.error(caught instanceof Error ? caught.message : "Unable to update paid amount.");
     } finally {
@@ -188,9 +178,8 @@ function CustomerPending() {
     }
   };
 
-  if (isError) return <p className="text-sm text-destructive">Unable to load invoices: {error instanceof Error ? error.message : "Unknown error"}</p>;
+  if (isError) return <p className="text-sm text-destructive">Unable to load pending customers: {error instanceof Error ? error.message : "Unknown error"}</p>;
   if (customersError) return <p className="text-sm text-destructive">Unable to load customer records: {customerError instanceof Error ? customerError.message : "Unknown error"}</p>;
-  if (paymentsError) return <p className="text-sm text-destructive">Unable to load saved payment details: {paymentError instanceof Error ? paymentError.message : "Unknown error"}</p>;
 
   return (
     <div className="space-y-6">

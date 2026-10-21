@@ -40,6 +40,13 @@ export interface AuditEntry {
   created_at: string; user_id: string | null; details: Record<string, unknown>;
 }
 export interface StoredInvoice { inv: Invoice; items: InvoiceItem[] }
+export interface InvoicePaymentSummary {
+  invoice_id: string;
+  invoice_number: string;
+  total: number;
+  paid_amount: number;
+  pending_amount: number;
+}
 
 type ItemWithInvoice = InvoiceItem & { invoices: { created_at: string; status: string; created_by: string | null } };
 
@@ -131,6 +138,10 @@ export const api = {
     if (raw?.invoice) return { inv: raw.invoice, items: raw.items ?? raw.invoice.items ?? [] };
     return splitInvoice(raw);
   },
+  invoicePaidAmounts: async (): Promise<Record<string, number>> =>
+    call(axiosInstance.get("/invoice-payments")),
+  setInvoicePaidAmount: async (invoiceId: string, paidAmount: number): Promise<InvoicePaymentSummary> =>
+    call(axiosInstance.post(`/invoices/${invoiceId}/payments`, { paid_amount: paidAmount })),
   /** Line items of every invoice since `from` (loaded from each invoice). */
   invoiceItems: async (from?: string): Promise<ItemWithInvoice[]> => {
     const list = await api.invoices(from);
