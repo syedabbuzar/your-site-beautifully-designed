@@ -10,6 +10,7 @@ import { Route as Sales } from "./pages/sales";
 import { Route as Invoice } from "./pages/invoice";
 import { Route as Products } from "./pages/products";
 import { Route as Customers } from "./pages/customers";
+import { Route as CustomerPending } from "./pages/customer-pending";
 import { Route as Purchases } from "./pages/purchases";
 import { Route as Reports } from "./pages/reports";
 import { Route as Audit } from "./pages/audit";
@@ -48,6 +49,7 @@ export default function App() {
           <Route path="/invoice/:id" element={<Invoice.component />} />
           <Route path="/products" element={<Products.component />} />
           <Route path="/customers" element={<Customers.component />} />
+          <Route path="/customer-pending" element={<CustomerPending.component />} />
           <Route path="/purchases" element={<Purchases.component />} />
           <Route path="/reports" element={<Reports.component />} />
           <Route path="/audit" element={<Audit.component />} />

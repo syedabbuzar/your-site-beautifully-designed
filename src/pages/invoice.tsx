@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Printer, ArrowLeft } from "lucide-react";
 import { api } from "@/services/api";
 import { inr } from "@/lib/billing";
+import { loadInvoicePaidAmounts, paidAmountForInvoice } from "@/lib/invoice-payments";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/app/Splash";
 
@@ -20,8 +21,13 @@ function InvoiceView() {
   const [layout, setLayout] = useState<Layout>("a4");
   const { data } = useQuery({ queryKey: ["invoice", id], queryFn: () => api.invoice(id) });
   const { data: s } = useQuery({ queryKey: ["settings"], queryFn: api.settings });
+  const paymentQuery = useQuery({ queryKey: ["invoice-paid-amounts"], queryFn: loadInvoicePaidAmounts });
+  const paidAmounts = paymentQuery.data ?? {};
   if (!data || !s) return <p className="text-muted-foreground">Loading invoice…</p>;
+  if (paymentQuery.isError) return <p className="text-destructive">Unable to load saved payment details: {paymentQuery.error instanceof Error ? paymentQuery.error.message : "Unknown error"}</p>;
   const { inv, items } = data;
+  const paidAmount = Math.min(Number(inv.grand_total), paidAmountForInvoice(inv, paidAmounts));
+  const pendingAmount = Math.max(0, Number(inv.grand_total) - paidAmount);
   const thermal = layout !== "a4";
 
   return (
@@ -72,6 +78,8 @@ function InvoiceView() {
           {Number(inv.discount_amount) > 0 && <Row k={`Discount${inv.discount_type === "percent" ? ` (${inv.discount_value}%)` : ""}`} v={`− ${inr(inv.discount_amount)}`} />}
           {Number(inv.gst_amount) > 0 && <Row k="GST" v={inr(inv.gst_amount)} />}
           <div className="flex justify-between border-t pt-1 text-base font-bold"><span>Grand Total</span><span className="num">{inr(inv.grand_total)}</span></div>
+          <Row k="Paid amount" v={inr(paidAmount)} />
+          <Row k="Pending amount" v={inr(pendingAmount)} />
           <Row k="Payment" v={inv.payment_method} />
         </div>
         <div className={thermal ? "my-2 border-t border-dashed" : "gold-rule my-5"} />

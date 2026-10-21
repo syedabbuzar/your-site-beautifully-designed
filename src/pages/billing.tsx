@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Search, Trash2, Plus, X } from "lucide-react";
 import { api, type Product } from "@/services/api";
 import { computeTotals, inr, lineAmount, meters, round2 } from "@/lib/billing";
+import { saveInvoicePaidAmount } from "@/lib/invoice-payments";
 import { useAuth } from "@/lib/auth";
 import { PageHeader, Panel } from "@/components/app/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,7 @@ function Billing() {
   const [custName, setCustName] = useState("");
   const [custMobile, setCustMobile] = useState("");
   const [pay, setPay] = useState("Cash");
+  const [paidAmountInput, setPaidAmountInput] = useState("0");
   const [discType, setDiscType] = useState<"fixed" | "percent">("fixed");
   const [discVal, setDiscVal] = useState("");
   const [busy, setBusy] = useState(false);
@@ -66,9 +68,16 @@ function Billing() {
 
   const lines = rows.map((r) => ({ quantity: Number(r.quantity) || 0, rate: Number(r.rate) || 0, gst_percent: 0 }));
   const totals = computeTotals(lines, discType, canDiscount ? Number(discVal) || 0 : 0, false);
+  const enteredPaidAmount = Number(paidAmountInput);
+  const paidAmount = Number.isFinite(enteredPaidAmount) ? round2(enteredPaidAmount) : 0;
+  const pendingAmount = round2(Math.max(0, totals.total - paidAmount));
 
   const submit = async () => {
     if (!rows.length) { toast.error("Add at least one product"); return; }
+    if (!Number.isFinite(enteredPaidAmount) || enteredPaidAmount < 0 || enteredPaidAmount > totals.total) {
+      toast.error("Paid amount must be between ₹0 and the grand total.");
+      return;
+    }
     for (const r of rows) {
       const qn = Number(r.quantity);
       if (!(qn > 0)) { toast.error(`Enter a valid quantity for ${r.product.name}`); return; }
@@ -87,6 +96,11 @@ function Billing() {
         discount_value: canDiscount ? round2(Number(discVal) || 0) : 0,
         items: rows.map((r) => ({ product_id: r.product.id, quantity: round2(Number(r.quantity)), rate: round2(Number(r.rate)) })),
       });
+      try {
+        saveInvoicePaidAmount(id, paidAmount);
+      } catch (error) {
+        toast.error(`Invoice created, but payment details could not be saved: ${error instanceof Error ? error.message : "Unknown error"}`);
+      }
       toast.success("Invoice created");
       qc.invalidateQueries();
       nav({ to: "/invoice/$id", params: { id } });
@@ -102,6 +116,7 @@ function Billing() {
     setCustName("");
     setCustMobile("");
     setPay(settings?.payment_methods[0] ?? "Cash");
+    setPaidAmountInput("0");
     setDiscType("fixed");
     setDiscVal("");
     setQ("");
@@ -221,6 +236,16 @@ function Billing() {
               <div className="flex justify-between text-muted-foreground"><span>Discount</span><span className="num">− {inr(totals.discount)}</span></div>
               <div className="gold-rule" />
               <div className="flex items-baseline justify-between"><span className="font-semibold">Grand total</span><span className="num font-display text-3xl font-semibold text-primary">{inr(totals.total)}</span></div>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <div>
+                  <Label htmlFor="paid-amount">Paid amount</Label>
+                  <Input id="paid-amount" type="number" min="0" max={totals.total} step="0.01" className="num mt-1" value={paidAmountInput} onChange={(event) => setPaidAmountInput(event.target.value)} />
+                </div>
+                <div className="flex flex-col justify-end rounded-md border bg-muted/40 px-3 py-2">
+                  <span className="text-sm text-muted-foreground">Pending amount</span>
+                  <span className="num font-semibold text-destructive">{inr(pendingAmount)}</span>
+                </div>
+              </div>
               <div>
                 <Label className="text-xs">Payment method</Label>
                 <div className="mt-1 flex flex-wrap gap-2">

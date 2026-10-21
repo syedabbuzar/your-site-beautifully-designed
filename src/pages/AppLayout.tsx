@@ -15,6 +15,7 @@ import {
   History,
   Menu,
   X,
+  Wallet,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { Splash, Logo } from "@/components/app/Splash";
@@ -28,6 +29,7 @@ const NAV = [
   { to: "/sales", label: "Invoices", icon: FileText, admin: false },
   { to: "/products", label: "Products", icon: Package, admin: true },
   { to: "/customers", label: "Customers", icon: Users, admin: true },
+  { to: "/customer-pending", label: "Customer Pending", icon: Wallet, admin: false },
   { to: "/purchases", label: "Purchase History", icon: Truck, admin: true },
   { to: "/reports", label: "Reports", icon: BarChart3, admin: true },
   { to: "/audit", label: "Audit Log", icon: History, admin: true },
@@ -35,7 +37,7 @@ const NAV = [
   { to: "/settings", label: "Settings", icon: Settings, admin: true },
 ] as const;
 
-const BILLING_ALLOWED = ["/billing", "/sales", "/invoice"];
+const BILLING_ALLOWED = ["/billing", "/sales", "/invoice", "/customer-pending"];
 
 function AppLayout() {
   const { loading, session, role, isActive, name, signOut } = useAuth();
@@ -60,11 +62,13 @@ function AppLayout() {
         { to: "/dashboard", label: "Home", icon: LayoutDashboard },
         { to: "/billing", label: "Billing", icon: Receipt },
         { to: "/sales", label: "Invoices", icon: FileText },
+        { to: "/customer-pending", label: "Pending", icon: Wallet },
         { to: "/products", label: "Products", icon: Package },
       ]
     : [
         { to: "/billing", label: "Billing", icon: Receipt },
         { to: "/sales", label: "Invoices", icon: FileText },
+        { to: "/customer-pending", label: "Pending", icon: Wallet },
       ];
 
   const isCurrentMobileItem = (path: string) =>

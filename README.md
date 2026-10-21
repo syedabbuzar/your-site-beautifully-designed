@@ -25,6 +25,8 @@ To open the built desktop app without the Vite development server, run `npm run 
 
 Authentication and business data use the configured backend; user accounts must be provisioned there. API methods are in `src/services/api.ts`, and authentication state is managed in `src/lib/auth.tsx`. Keep their page-facing methods and result types stable when changing backend integration.
 
+Billing records paid amounts for customer balance summaries in this browser's local storage. These payment amounts are not synchronized to other devices or users unless the backend adds invoice-payment support.
+
 ## Android APK with Capacitor
 
 The app uses hash-based routing so all routes work inside the bundled Capacitor WebView. Native API requests use Capacitor's HTTPS transport; browser development and web hosting keep their existing `/api` proxy. Android cleartext traffic is not enabled. The supplied logo source is `resources/logo.png`; generated Android launcher icons are in `android/app/src/main/res/mipmap-*`.
