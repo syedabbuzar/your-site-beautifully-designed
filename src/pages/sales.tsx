@@ -61,7 +61,7 @@ function Sales() {
       run(() => api.cancelInvoice(i.id, "Cancelled by staff"), "Invoice cancelled and stock restored");
   };
   const remove = async (i: Invoice) => {
-    if (await confirmToast(`Delete ${i.invoice_number} permanently? Stock will be returned and any recorded payment will be removed.`)) {
+    if (await confirmToast(`Delete ${i.invoice_number} permanently? Stock will be returned and recorded payments will be removed.`)) {
       try {
         await api.deleteInvoice(i.id);
         toast.success("Invoice deleted");
